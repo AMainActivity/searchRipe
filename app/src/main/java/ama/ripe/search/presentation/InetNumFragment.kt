@@ -3,6 +3,8 @@ package ama.ripe.search.presentation
 import ama.ripe.search.R
 import ama.ripe.search.databinding.FragmentInetNumBinding
 import ama.ripe.search.presentation.adapters.InetNumAdapter
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,10 +13,13 @@ import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import javax.inject.Inject
 
@@ -44,6 +49,17 @@ class InetNumFragment : Fragment() {
         _binding = FragmentInetNumBinding.inflate(inflater, container, false)
         return binding.root
 
+    }
+
+    private fun copyTextToClipboard(textToCopy: String) {
+        val clipboardManager =
+            requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText(TEXT_STRING, textToCopy)
+        clipboardManager.setPrimaryClip(clipData)
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.frgmnt_inetnum_copy_text), Toast.LENGTH_LONG
+        ).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +100,9 @@ class InetNumFragment : Fragment() {
 
     private fun setObserverState() {
         viewModel.stateInetNum.observe(viewLifecycleOwner) {
+            if (viewLifecycleOwner.lifecycle.currentState != Lifecycle.State.RESUMED) {
+                return@observe
+            }
             when (it) {
                 is StateLoading.Initial -> {
                     binding.progressBarLoading.isVisible = false
@@ -100,9 +119,10 @@ class InetNumFragment : Fragment() {
                 }
 
                 is StateLoading.ContentError -> {
-                    Toast.makeText(requireContext(), it.er, Toast.LENGTH_SHORT).show()
                     binding.progressBarLoading.isVisible = false
-                    adapter.modifyList(listOf())
+                    binding.llEmptyList.isVisible = true
+                    binding.tvInetNumNoData.text = it.er
+                    // adapter.modifyList(listOf())
                 }
             }
         }
@@ -111,7 +131,7 @@ class InetNumFragment : Fragment() {
     private fun setAdapterClick() {
         adapter.onInetNumClickListener = object : InetNumAdapter.OnInetNumClickListener {
             override fun onInetNumClick(tInfo: String) {
-                Toast.makeText(requireContext(), tInfo, Toast.LENGTH_SHORT).show()
+                copyTextToClipboard(tInfo)
             }
         }
     }
@@ -130,7 +150,6 @@ class InetNumFragment : Fragment() {
         viewModel.loadData(orgName)
         setObserverState()
         setAdapterClick()
-
     }
 
     override fun onDestroyView() {
@@ -149,9 +168,9 @@ class InetNumFragment : Fragment() {
     }
 
     companion object {
-
         const val NAME = "InetNumFragment"
         const val EMPTY_STRING = ""
+        const val TEXT_STRING = "text"
         const val ARG_INET_NUM = "ARG_INET_NUM"
 
         fun newInstance(string: String): InetNumFragment {

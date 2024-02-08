@@ -38,4 +38,5 @@
        &lt;a href=\'mailto:10ama@mail.ru\'>10ama@mail.ru&lt;/a>.&lt;/p>
     </string>
     <string name="item_org_info_but">Информация</string>
+    <string name="frgmnt_inetnum_copy_text">Текст скопирован</string>
 </resources>

@@ -87,7 +87,6 @@ class OrganizationFragment : Fragment() {
 
     private fun setObserverState() {
         viewModel.stateOrganization.observe(viewLifecycleOwner) {
-
             when (it) {
                 is StateLoading.Initial -> {
                     binding.progressBarLoading.isVisible = false

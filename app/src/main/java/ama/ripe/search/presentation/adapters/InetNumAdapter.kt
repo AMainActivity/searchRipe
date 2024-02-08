@@ -51,14 +51,14 @@ class InetNumAdapter : ListAdapter<InetNumDomModel, InetNumViewHolder>(InetNumDi
                 tvTitle.text = inetNum
                 tvInfo.text = netName
                 if (countryFlag != null)
-                    Picasso.get().load(countryFlag).placeholder(R.drawable.splash)
+                    Picasso.get().load(countryFlag).placeholder(R.drawable.no_image)
                         .into(ivLogoCountry)
                 ivLogoCountry.visibility = if (countryFlag != null) View.VISIBLE else View.GONE
 
 
 
                 root.setOnClickListener {
-                    onInetNumClickListener?.onInetNumClick(inetNum)
+                    onInetNumClickListener?.onInetNumClick(netName + "\n" + inetNum)
                 }
             }
         }

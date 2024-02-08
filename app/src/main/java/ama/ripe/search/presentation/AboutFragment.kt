@@ -9,9 +9,11 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 
 class AboutFragment : Fragment() {
     private var _binding: FragmentAboutBinding? = null
@@ -21,6 +23,19 @@ class AboutFragment : Fragment() {
 
     private val component by lazy {
         (requireActivity().application as MyApp).component
+    }
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            goOrgFragment()
+            remove()
+        }
+    }
+
+    private fun goOrgFragment() {
+        activity?.supportFragmentManager?.popBackStack(
+            null,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
     }
 
     override fun onAttach(context: Context) {
@@ -55,6 +70,10 @@ class AboutFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSubTitleActionBar(getString(R.string.frgmnt_about_ab_subtitle))
         setViews()
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
     }
 
     override fun onDestroyView() {

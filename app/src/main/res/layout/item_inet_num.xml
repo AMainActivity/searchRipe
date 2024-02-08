@@ -7,7 +7,7 @@
     android:layout_margin="4dp"
     android:background="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
-    app:cardBackgroundColor="#FFF0F5"
+    app:cardBackgroundColor="@color/blue"
     app:cardCornerRadius="7dp"
     app:cardElevation="2dp"
     app:cardUseCompatPadding="true"

@@ -77,9 +77,9 @@ class RipeSearchRepositoryImpl @Inject constructor(
         if (mResponse.isSuccessful) {
             if (mBody != null) {
                 orgObjectDao.insertOrgObjectList(mBody.toDbs())
-                /*if (mBody.toEntities().isEmpty())
+                if (mBody.toEntities().isEmpty())
                     _organizationState.postValue(StateLoading.ContentError(emptyList))
-                else*/
+                else
                     _organizationState.postValue(StateLoading.Content(mBody.toEntities()))
             } else {
                 _organizationState.postValue(StateLoading.ContentError(emptyBody))
@@ -184,9 +184,9 @@ class RipeSearchRepositoryImpl @Inject constructor(
                 if (list.isNotEmpty()) {
                     insertIps(ipString, list.toDbs())
                     _organizationState.postValue(StateLoading.Content(list.toEntities()))
-                } /*else {
+                } else {
                     _organizationState.postValue(StateLoading.ContentError(emptyList))
-                }*/
+                }
             } else {
                 _organizationState.postValue(StateLoading.ContentError(emptyBody))
             }
@@ -239,9 +239,9 @@ class RipeSearchRepositoryImpl @Inject constructor(
         if (mResponse.isSuccessful) {
             if (mBody != null) {
                 insertInetNum(orgId, mBody)
-                /*if (mBody.toEntities().isEmpty())
+                if (mBody.toEntities().isEmpty())
                     _inetNumState.postValue(StateLoading.ContentError(emptyList))
-                else*/
+                else
                     _inetNumState.postValue(StateLoading.Content(mBody.dtoToInetNUMEntities()))
             } else {
                 _inetNumState.postValue(StateLoading.ContentError(emptyBody))

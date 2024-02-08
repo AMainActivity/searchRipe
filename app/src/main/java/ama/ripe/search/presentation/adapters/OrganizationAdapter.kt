@@ -10,7 +10,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.squareup.picasso.Picasso
 
-class OrganizationAdapter : ListAdapter<OrganizationDomModel, OrganizationViewHolder>(OrganizationDiffCallback) {
+class OrganizationAdapter :
+    ListAdapter<OrganizationDomModel, OrganizationViewHolder>(OrganizationDiffCallback) {
 
     var onOrganizationClickListener: OnOrganizationClickListener? = null
     var onButtonInfoClickListener: OnButtonInfoClickListener? = null
@@ -29,17 +30,17 @@ class OrganizationAdapter : ListAdapter<OrganizationDomModel, OrganizationViewHo
             ctx.getString(R.string.org_info_format),
             ctx.getString(R.string.org_address),
             itemOrg.address
-        )/*"<b>Адрес: </b> $itemOrg.address"*/ else EMPTY_STRING
+        ) else EMPTY_STRING
         val phone = if (itemOrg.phone.isNotEmpty()) String.format(
             ctx.getString(R.string.org_info_format),
             ctx.getString(R.string.org_phone),
             itemOrg.phone
-        )/*"<b>Телефон: </b> $itemOrg.phone"*/ else EMPTY_STRING
+        ) else EMPTY_STRING
         val faxNo = if (itemOrg.faxNo.isNotEmpty()) String.format(
             ctx.getString(R.string.org_info_format),
             ctx.getString(R.string.org_faxNo),
             itemOrg.faxNo
-        )/*"<b>Факс: </b> $itemOrg.faxNo"*/ else EMPTY_STRING
+        ) else EMPTY_STRING
         return listOf(address, phone, faxNo)
     }
 
@@ -59,7 +60,7 @@ class OrganizationAdapter : ListAdapter<OrganizationDomModel, OrganizationViewHo
                 tvInfo.text = organization
                 if (countryFlag != null)
                     Picasso.get().load(countryFlag)
-                        .placeholder(R.drawable.splash)
+                        .placeholder(R.drawable.no_image)
                         .into(ivLogoCountry)
                 ivLogoCountry.visibility = if (countryFlag != null) View.VISIBLE else View.GONE
 
@@ -68,7 +69,7 @@ class OrganizationAdapter : ListAdapter<OrganizationDomModel, OrganizationViewHo
 
                 frgmntOrgInfo.setOnClickListener {
                     onButtonInfoClickListener?.onButtonInfoClick(
-                        String.format(ORG_INFO, s[0], s[1], s[2])//"${s[0]}<br>${s[1]}<br>${s[2]}"
+                        String.format(ORG_INFO, s[0], s[1], s[2])
                     )
                 }
 
