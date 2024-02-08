@@ -106,14 +106,17 @@ class InetNumFragment : Fragment() {
             when (it) {
                 is StateLoading.Initial -> {
                     binding.progressBarLoading.isVisible = false
+                    binding.llEmptyList.isVisible = false
                 }
 
                 is StateLoading.Loading -> {
                     binding.progressBarLoading.isVisible = true
+                    binding.llEmptyList.isVisible = false
                 }
 
                 is StateLoading.Content -> {
                     binding.progressBarLoading.isVisible = false
+                    binding.llEmptyList.isVisible = false
                     adapter.modifyList(it.currencyList)
                     //adapter.submitList(it.currencyList)
                 }

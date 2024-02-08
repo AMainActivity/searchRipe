@@ -87,23 +87,28 @@ class OrganizationFragment : Fragment() {
 
     private fun setObserverState() {
         viewModel.stateOrganization.observe(viewLifecycleOwner) {
+            adapter.submitList(listOf())
             when (it) {
                 is StateLoading.Initial -> {
                     binding.progressBarLoading.isVisible = false
+                    binding.llEmptyList.isVisible = false
                 }
 
                 is StateLoading.Loading -> {
                     binding.progressBarLoading.isVisible = true
+                    binding.llEmptyList.isVisible = false
                 }
 
                 is StateLoading.Content -> {
                     binding.progressBarLoading.isVisible = false
+                    binding.llEmptyList.isVisible = false
                     adapter.submitList(it.currencyList)
                 }
 
                 is StateLoading.ContentError -> {
-                    Toast.makeText(requireContext(), it.er, Toast.LENGTH_SHORT).show()
                     binding.progressBarLoading.isVisible = false
+                    binding.llEmptyList.isVisible = true
+                    binding.tvOrgNoData.text = it.er
                 }
             }
         }
