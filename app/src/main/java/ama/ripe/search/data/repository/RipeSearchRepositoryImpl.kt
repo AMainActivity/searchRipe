@@ -1,15 +1,17 @@
 package ama.ripe.search.data.repository
 
+import ama.ripe.search.R
 import ama.ripe.search.data.database.InetNumObjectDao
 import ama.ripe.search.data.database.IpDao
 import ama.ripe.search.data.database.OrgObjectDao
 import ama.ripe.search.data.database.models.IpOrganization
 import ama.ripe.search.data.database.models.OrganizationDbModel
+import ama.ripe.search.data.mapper.dtoToInetNUMEntities
 import ama.ripe.search.data.mapper.toDbs
 import ama.ripe.search.data.mapper.toDomEntities
 import ama.ripe.search.data.mapper.toEntities
 import ama.ripe.search.data.mapper.toInetNumDbs
-import ama.ripe.search.data.mapper.toInetNumEntities
+import ama.ripe.search.data.mapper.toInetDomEntities
 import ama.ripe.search.data.network.RipeSearchApiService
 import ama.ripe.search.data.network.model.ObjectDto
 import ama.ripe.search.domain.entity.InetNumDomModel
@@ -22,11 +24,9 @@ import android.net.ConnectivityManager
 import android.net.InetAddresses
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 
@@ -38,14 +38,16 @@ class RipeSearchRepositoryImpl @Inject constructor(
     private val application: Application
 ) : RipeSearchRepository {
 
+    private val emptyBody = application.getString(R.string.empty_body)
+    private val emptyList = application.getString(R.string.empty_list)
 
     private val _organizationState =
         MutableLiveData<StateLoading<OrganizationDomModel>>(StateLoading.Initial)
-    val organizationState: LiveData<StateLoading<OrganizationDomModel>> = _organizationState
+    private val organizationState: LiveData<StateLoading<OrganizationDomModel>> = _organizationState
 
 
     private val _inetNumState = MutableLiveData<StateLoading<InetNumDomModel>>(StateLoading.Initial)
-    val inetNumState: LiveData<StateLoading<InetNumDomModel>> = _inetNumState
+    private val inetNumState: LiveData<StateLoading<InetNumDomModel>> = _inetNumState
 
     private fun checkInternet(): Boolean {
         val cm = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -75,31 +77,26 @@ class RipeSearchRepositoryImpl @Inject constructor(
         if (mResponse.isSuccessful) {
             if (mBody != null) {
                 orgObjectDao.insertOrgObjectList(mBody.toDbs())
-                if (mBody.toEntities().isEmpty())
-                    _organizationState.postValue(StateLoading.ContentError("Empty list"))
-                else
+                /*if (mBody.toEntities().isEmpty())
+                    _organizationState.postValue(StateLoading.ContentError(emptyList))
+                else*/
                     _organizationState.postValue(StateLoading.Content(mBody.toEntities()))
             } else {
-                _organizationState.postValue(StateLoading.ContentError("Empty body"))
+                _organizationState.postValue(StateLoading.ContentError(emptyBody))
             }
         } else {
-
-            Log.e("ContentError", "ContentError")
             _organizationState.postValue(
                 StateLoading.ContentError(
                     getErrorCode(mResponse.code(), string)
                 )
             )
-
         }
-
     }
 
-    //при старте приложения
     override suspend fun getOrgList() {
         val res = orgObjectDao.getOrgObjectList()
         if (res.isEmpty())
-            _organizationState.postValue(StateLoading.ContentError("Empty list"))
+            _organizationState.postValue(StateLoading.ContentError(emptyList))
         else
             _organizationState.postValue(StateLoading.Content(res.toDomEntities()))
     }
@@ -107,27 +104,24 @@ class RipeSearchRepositoryImpl @Inject constructor(
     private fun getOrgListByName(name: String) {
         val res = orgObjectDao.getOrgListByName(name)
         if (res.isEmpty())
-            _organizationState.postValue(StateLoading.ContentError("Empty list"))
+            _organizationState.postValue(StateLoading.ContentError(emptyList))
         else
             _organizationState.postValue(StateLoading.Content(res.toDomEntities()))
     }
-
 
     private fun getOrgListByIp(ip: String) {
         val res = orgObjectDao.getOrgListByIp(ip)
         if (res.isEmpty())
-            _organizationState.postValue(StateLoading.ContentError("Empty list"))
+            _organizationState.postValue(StateLoading.ContentError(emptyList))
         else
             _organizationState.postValue(StateLoading.Content(res.toDomEntities()))
     }
 
-    override suspend fun getOrganization(string: String)/*: List<OrganizationDomModel>*/ {
+    override suspend fun getOrganization(string: String) {
 
         if (checkInternet()) {
-            Log.e("checkInternet", "true")
             if (isIpValid(string)) getInetNumByIp(string) else getOrgInfo(string)
         } else {
-            Log.e("checkInternet", "false")
             if (isIpValid(string)) getOrgListByIp(string) else getOrgListByName(string)
         }
     }
@@ -144,10 +138,9 @@ class RipeSearchRepositoryImpl @Inject constructor(
         }
     }
 
-
     private suspend fun insertIps(ipString: String, list: List<OrganizationDbModel>) {
-        var listLong = orgObjectDao.insertOrgObjectList(list)
-        var listLong2 = orgObjectDao.getListIdByOrgName(list.map { it.organization })
+        val listLong = orgObjectDao.insertOrgObjectList(list)
+        val listLong2 = orgObjectDao.getListIdByOrgName(list.map { it.organization })
         ipDao.insertIpList((listLong.plus(listLong2))
             .filter { it >= 0 }
             .map {
@@ -158,14 +151,10 @@ class RipeSearchRepositoryImpl @Inject constructor(
             })
     }
 
-
     private suspend fun getOrgNameByIdentificator(identificator: String): List<ObjectDto> {
-        Log.e("identificator", identificator)
         val mResponse = apiService.getOrganizationByIdentificator(identificator)
-        val mBody = mResponse.body()?.mObjects?.mObjectList?.get(0)
-        Log.e("identificator5", mResponse.body().toString())
+        val mBody = mResponse.body()?.mObjects?.mObjectList?.get(FIRST_INDEX)
         return if (mResponse.isSuccessful) {
-            Log.e("identificator4", mBody.toString())
             if (mBody != null) {
                 listOf(mBody)
             } else {
@@ -176,39 +165,30 @@ class RipeSearchRepositoryImpl @Inject constructor(
         }
     }
 
-    //ip
     private suspend fun getInetNumByIp(ipString: String) {
 
         val currentState = _organizationState.value
         if (currentState !is StateLoading.Content || currentState.currencyList != null) {
             _organizationState.postValue(StateLoading.Loading)
         }
-
         val mResponse = apiService.getOrganizationByIp(queryString = ipString)
         val mBody = mResponse.body()?.mObjects?.mObjectList
         if (mResponse.isSuccessful) {
             if (mBody != null) {
-                Log.e("identificator1", mBody.toString())
-                val identificator =
-                    mBody[0].mAttributes.mAttribute.filter { it.mName.contains("org") }[0].mValue
-                val list = getOrgNameByIdentificator(identificator)
-                Log.e("identificator2", list.toString())
-                /*
-                val list=listOf(Attr("org","111"),Attr("adres","www"),Attr("pnone","02"))
-        val s=list.filter{it.name.contains("org")}
-        println(s[0].value.toString())
-                */
+                val temp =
+                    mBody[FIRST_INDEX].mAttributes.mAttribute.filter { it.mName.contains(PARAM_ORG) }
+                val list = if (temp.isNotEmpty()) {
+                    getOrgNameByIdentificator(temp[FIRST_INDEX].mValue)
+                } else listOf()
+
                 if (list.isNotEmpty()) {
                     insertIps(ipString, list.toDbs())
-                    /*if (list.toEntities().isEmpty())
-                        _organizationState.postValue(StateLoading.ContentError("Empty list"))
-                    else*/
                     _organizationState.postValue(StateLoading.Content(list.toEntities()))
-                } else {
-                    _organizationState.postValue(StateLoading.ContentError("Empty body"))
-                }
+                } /*else {
+                    _organizationState.postValue(StateLoading.ContentError(emptyList))
+                }*/
             } else {
-                _organizationState.postValue(StateLoading.ContentError("Empty body"))
+                _organizationState.postValue(StateLoading.ContentError(emptyBody))
             }
         } else {
             _organizationState.postValue(
@@ -222,21 +202,18 @@ class RipeSearchRepositoryImpl @Inject constructor(
     override suspend fun getInetNumByOrg(orgName: String) {
         if (checkInternet()) {
             getInetNumByOrgFromNet(orgName)
-            Log.e("checkInternet", "true")
         } else {
             getInetNumByOrgFromDb(orgName)
-            Log.e("checkInternet", "false")
         }
 
     }
 
     private fun getInetNumByOrgFromDb(orgName: String) {
-
         val res = inetNumObjectDao.getInetNumListByOrgName(orgName)
         if (res.isEmpty())
-            _inetNumState.postValue(StateLoading.ContentError("Empty list"))
+            _inetNumState.postValue(StateLoading.ContentError(emptyList))
         else
-            _inetNumState.postValue(StateLoading.Content(res.toInetNumEntities()))
+            _inetNumState.postValue(StateLoading.Content(res.toInetDomEntities()))
 
     }
 
@@ -256,19 +233,18 @@ class RipeSearchRepositoryImpl @Inject constructor(
         if (currentState !is StateLoading.Content || currentState.currencyList != null) {
             _inetNumState.postValue(StateLoading.Loading)
         }
-
         val mResponse = apiService.getInetNumByOrg(queryString = orgName)
         val mBody = mResponse.body()?.mObjects?.mObjectList
         val orgId = getOrgIdByName(orgName)
         if (mResponse.isSuccessful) {
             if (mBody != null) {
                 insertInetNum(orgId, mBody)
-                if (mBody.toEntities().isEmpty())
-                    _inetNumState.postValue(StateLoading.ContentError("Empty list"))
-                else
-                    _inetNumState.postValue(StateLoading.Content(mBody.toInetNumEntities(orgId)))
+                /*if (mBody.toEntities().isEmpty())
+                    _inetNumState.postValue(StateLoading.ContentError(emptyList))
+                else*/
+                    _inetNumState.postValue(StateLoading.Content(mBody.dtoToInetNUMEntities()))
             } else {
-                _inetNumState.postValue(StateLoading.ContentError("Empty body"))
+                _inetNumState.postValue(StateLoading.ContentError(emptyBody))
             }
         } else {
             _inetNumState.postValue(
@@ -280,9 +256,24 @@ class RipeSearchRepositoryImpl @Inject constructor(
     }
 
     private fun getErrorCode(code: Int, string: String?) = when (code) {
-        404 -> "No object(s) found: ${string ?: ""}"
-        400 -> "Illegal input - incorrect value in one or more of the parameters"
-        200 -> "Search successful"
-        else -> "Error"
+        CODE_404 -> String.format(CODE_404_TEXT, string ?: EMPTY_STRING)
+        CODE_400 -> CODE_400_TEXT
+        CODE_200 -> CODE_200_TEXT
+        else -> String.format(CODE_ELSE_TEXT, code)
     }
+
+
+    companion object {
+        const val FIRST_INDEX = 0
+        const val PARAM_ORG = "org"
+        const val EMPTY_STRING = ""
+        const val CODE_404 = 404
+        const val CODE_400 = 400
+        const val CODE_200 = 200
+        const val CODE_404_TEXT = "No object(s) found: %s"
+        const val CODE_400_TEXT = "Illegal input - incorrect value in one or more of the parameters"
+        const val CODE_200_TEXT = "Search successful"
+        const val CODE_ELSE_TEXT = "Error %s"
+    }
+
 }

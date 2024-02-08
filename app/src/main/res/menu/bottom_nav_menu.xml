@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/page_1"
+        android:id="@+id/page_ripe_search"
         android:enabled="true"
-        android:icon="@android:drawable/ic_menu_my_calendar"
-        android:title="поиск организации" />
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="@string/frgmnt_org_ab_subtitle" />
     <item
-        android:id="@+id/page_2"
+        android:id="@+id/page_about"
         android:enabled="true"
-        android:icon="@android:drawable/ic_menu_my_calendar"
-        android:title="о приложении" />
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/frgmnt_about_ab_subtitle" />
 </menu>

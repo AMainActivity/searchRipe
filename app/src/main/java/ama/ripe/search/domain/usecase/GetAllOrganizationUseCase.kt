@@ -6,6 +6,5 @@ import javax.inject.Inject
 class GetAllOrganizationUseCase @Inject constructor(
     private val repository: RipeSearchRepository
 ) {
-
     suspend operator fun invoke() = repository.getOrgList()
 }

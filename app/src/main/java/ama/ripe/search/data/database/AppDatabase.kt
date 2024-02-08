@@ -1,5 +1,6 @@
 package ama.ripe.search.data.database
 
+import ama.ripe.search.data.database.AppDatabase.Companion.DB_VERSION
 import ama.ripe.search.data.database.models.InetNumDbModel
 import ama.ripe.search.data.database.models.IpOrganization
 import ama.ripe.search.data.database.models.OrganizationDbModel
@@ -14,7 +15,7 @@ import androidx.room.RoomDatabase
         InetNumDbModel::class,
         IpOrganization::class
     ],
-    version = 1,
+    version = DB_VERSION,
     exportSchema = false
 )
 
@@ -23,6 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private var db: AppDatabase? = null
         private const val DB_NAME = "main.db"
+        const val DB_VERSION = 1
         private val LOCK = Any()
 
         fun getInstance(context: Context): AppDatabase {

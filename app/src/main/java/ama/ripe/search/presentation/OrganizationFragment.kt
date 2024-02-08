@@ -5,7 +5,6 @@ import ama.ripe.search.databinding.FragmentOrganizationBinding
 import ama.ripe.search.presentation.adapters.OrganizationAdapter
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -59,6 +58,7 @@ class OrganizationFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.loadData(query)
+                setSubTitleActionBar(query)
                 searchView.onActionViewCollapsed()
                 return false
             }
@@ -72,7 +72,7 @@ class OrganizationFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentOrganizationBinding.inflate(inflater, container, false)
         return binding.root
@@ -103,7 +103,6 @@ class OrganizationFragment : Fragment() {
                 }
 
                 is StateLoading.ContentError -> {
-                    Log.e("ContentError", it.er)
                     Toast.makeText(requireContext(), it.er, Toast.LENGTH_SHORT).show()
                     binding.progressBarLoading.isVisible = false
                 }
@@ -115,7 +114,6 @@ class OrganizationFragment : Fragment() {
         adapter.onOrganizationClickListener =
             object : OrganizationAdapter.OnOrganizationClickListener {
                 override fun onOrganizationClick(tInfo: String) {
-                    Toast.makeText(requireContext(), tInfo, Toast.LENGTH_SHORT).show()
                     launchSecondFragment(tInfo)
                 }
             }
@@ -127,12 +125,15 @@ class OrganizationFragment : Fragment() {
         }
     }
 
+    private fun setSubTitleActionBar(text: String) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.subtitle = text
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this, viewModelFactory)[OrganizationViewModel::class.java]
-        (requireActivity() as AppCompatActivity).supportActionBar?.subtitle =
-            "Поиск организации"
+        setSubTitleActionBar(getString(R.string.frgmnt_org_ab_subtitle))
         setAdapter()
         setObserverState()
         setAdapterClick()
@@ -140,7 +141,7 @@ class OrganizationFragment : Fragment() {
 
     private fun orgInfoAlertDialog(info: String) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Инфо")
+            .setTitle(getString(R.string.frgmnt_org_alert_title))
             .setMessage(
                 HtmlCompat.fromHtml(
                     info,
@@ -148,7 +149,7 @@ class OrganizationFragment : Fragment() {
                 )
             )
             .setCancelable(true)
-            .setNegativeButton("Закрыть") { dialogInterface, i ->
+            .setNegativeButton(getString(R.string.frgmnt_org_alert_close)) { dialogInterface, i ->
                 dialogInterface.dismiss()
             }
             .show()

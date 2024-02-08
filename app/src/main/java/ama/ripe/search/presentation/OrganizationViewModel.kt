@@ -25,12 +25,10 @@ class OrganizationViewModel @Inject constructor(
         loadAllData()
     }
 
-
     fun loadData(stringOrg: String) {
         viewModelScope.launch(Dispatchers.Default) {
             getOrganizationUseCase(stringOrg.trim())    /*"87.226.162.216""rostelecom"*/
 
         }
     }
-
 }

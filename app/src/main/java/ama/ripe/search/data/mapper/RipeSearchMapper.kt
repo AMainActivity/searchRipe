@@ -6,28 +6,42 @@ import ama.ripe.search.data.network.model.ObjectDto
 import ama.ripe.search.domain.entity.InetNumDomModel
 import ama.ripe.search.domain.entity.OrganizationDomModel
 
+
+private const val EMPTY_STRING = ""
+private const val COUNTRY_URL = "https://flagsapi.com/%s/shiny/64.png"
+private const val PARAM_INETNUM = "inetnum"
+private const val PARAM_NETNAME = "netname"
+private const val PARAM_COUNTRY = "country"
+private const val PARAM_ORGANIZATION = "organisation"
+private const val PARAM_ADDRESS = "address"
+private const val PARAM_PHONE = "phone"
+private const val PARAM_FAX_NO = "fax-no"
+private const val PARAM_ORG_NAME = "org-name"
+private const val STRING_NEW_LINE = "\n"
+
+
 fun List<ObjectDto>.toDbs(): List<OrganizationDbModel> = map { mapDtoToDbModel(it) }
 fun List<ObjectDto>.toInetNumDbs(id: Int): List<InetNumDbModel> =
     map { mapDtoToInetNumDbModel(it, id) }
 
 
 fun mapDtoToInetNumDbModel(dto: ObjectDto, id: Int): InetNumDbModel {
-    var countryUrl = ""
-    var inetNum = ""
-    var netName = ""
+    var countryUrl = EMPTY_STRING
+    var inetNum = EMPTY_STRING
+    var netName = EMPTY_STRING
     var checkCountry = false
     dto.mAttributes.mAttribute.forEach()
     {
         when (it.mName) {
 
-            "inetnum" -> inetNum = it.mValue
-            "netname" -> netName = it.mValue
-            "country" -> {
+            PARAM_INETNUM -> inetNum = it.mValue
+            PARAM_NETNAME -> netName = it.mValue
+            PARAM_COUNTRY -> {
                 checkCountry = true
-                countryUrl = "https://flagsapi.com/${it.mValue}/shiny/64.png"
+                countryUrl = String.format(COUNTRY_URL, it.mValue)
             }
 
-            else -> ""
+            else -> EMPTY_STRING
         }
     }
     return InetNumDbModel(
@@ -39,32 +53,32 @@ fun mapDtoToInetNumDbModel(dto: ObjectDto, id: Int): InetNumDbModel {
 }
 
 fun mapDtoToDbModel(dto: ObjectDto): OrganizationDbModel {
-    var countryUrl = ""
-    var orgName = ""
+    var countryUrl = EMPTY_STRING
+    var orgName = EMPTY_STRING
     var checkCountry = false
-    var organization = ""
-    var address = ""
-    var phone = ""
-    var faxNo = ""
+    var organization = EMPTY_STRING
+    var address = EMPTY_STRING
+    var phone = EMPTY_STRING
+    var faxNo = EMPTY_STRING
     dto.mAttributes.mAttribute.forEach()
     {
 
         when (it.mName) {
-            "organisation" -> {
+            PARAM_ORGANIZATION -> {
                 organization = it.mValue
             }
 
-            "address" -> address += it.mValue + "\n"
-            "phone" -> phone = it.mValue
-            "fax-no" -> faxNo = it.mValue
-            "org-name" -> orgName = it.mValue
+            PARAM_ADDRESS -> address += it.mValue + STRING_NEW_LINE
+            PARAM_PHONE -> phone = it.mValue
+            PARAM_FAX_NO -> faxNo = it.mValue
+            PARAM_ORG_NAME -> orgName = it.mValue
             //"org" -> orgName = it.mValue
-            "country" -> {
+            PARAM_COUNTRY -> {
                 checkCountry = true
-                countryUrl = "https://flagsapi.com/${it.mValue}/shiny/64.png"
+                countryUrl = String.format(COUNTRY_URL, it.mValue)
             }
 
-            else -> ""
+            else -> EMPTY_STRING
         }
     }
     return OrganizationDbModel(
@@ -81,10 +95,10 @@ fun List<ObjectDto>.toEntities(): List<OrganizationDomModel> = map { mapDtoToDom
 fun List<OrganizationDbModel>.toDomEntities(): List<OrganizationDomModel> =
     map { mapOrgDbToDomModel(it) }
 
-fun List<ObjectDto>.toInetNumEntities(id: Int): List<InetNumDomModel> =
-    map { mapDtoToDomModel(it, id) }
+fun List<ObjectDto>.dtoToInetNUMEntities(): List<InetNumDomModel> =
+    map { mapInetNumDtoToDomModel(it) }
 
-fun List<InetNumDbModel>.toInetNumEntities(): List<InetNumDomModel> =
+fun List<InetNumDbModel>.toInetDomEntities(): List<InetNumDomModel> =
     map { mapInetNumDtoToDomModel(it) }
 
 
@@ -102,30 +116,30 @@ fun mapOrgDbToDomModel(oDb: OrganizationDbModel): OrganizationDomModel {
         organization = oDb.organization,
         orgName = oDb.orgName,
         countryFlag = oDb.countryFlag,
-        address = oDb.address?:"",
-        phone = oDb.phone?:"",
-        faxNo = oDb.faxNo?:""
+        address = oDb.address ?: EMPTY_STRING,
+        phone = oDb.phone ?: EMPTY_STRING,
+        faxNo = oDb.faxNo ?: EMPTY_STRING
     )
 }
 
-fun mapDtoToDomModel(dto: ObjectDto, id: Int): InetNumDomModel {
-    var countryUrl = ""
+fun mapInetNumDtoToDomModel(dto: ObjectDto): InetNumDomModel {
+    var countryUrl = EMPTY_STRING
     var checkCountry = false
-    var inetNum = ""
-    var netName = ""
+    var inetNum = EMPTY_STRING
+    var netName = EMPTY_STRING
     dto.mAttributes.mAttribute.forEach()
     {
 
         when (it.mName) {
 
-            "inetnum" -> inetNum = it.mValue
-            "netname" -> netName = it.mValue
-            "country" -> {
+            PARAM_INETNUM -> inetNum = it.mValue
+            PARAM_NETNAME -> netName = it.mValue
+            PARAM_COUNTRY -> {
                 checkCountry = true
-                countryUrl = "https://flagsapi.com/${it.mValue}/shiny/64.png"
+                countryUrl = String.format(COUNTRY_URL, it.mValue)
             }
 
-            else -> ""
+            else -> EMPTY_STRING
         }
     }
     return InetNumDomModel(
@@ -136,31 +150,31 @@ fun mapDtoToDomModel(dto: ObjectDto, id: Int): InetNumDomModel {
 }
 
 fun mapDtoToDomModel(dto: ObjectDto): OrganizationDomModel {
-    var countryUrl = ""
+    var countryUrl = EMPTY_STRING
     var checkCountry = false
-    var orgName = ""
-    var organization = ""
-    var address = ""
-    var phone = ""
-    var faxNo = ""
+    var orgName = EMPTY_STRING
+    var organization = EMPTY_STRING
+    var address = EMPTY_STRING
+    var phone = EMPTY_STRING
+    var faxNo = EMPTY_STRING
     dto.mAttributes.mAttribute.forEach()
     {
         when (it.mName) {
-            "organisation" -> {
+            PARAM_ORGANIZATION -> {
                 organization = it.mValue
             }
 
-            "address" -> address += it.mValue + "\n"
-            "phone" -> phone = it.mValue
-            "fax-no" -> faxNo = it.mValue
-            "org-name" -> orgName = it.mValue
+            PARAM_ADDRESS -> address += it.mValue + STRING_NEW_LINE
+            PARAM_PHONE -> phone = it.mValue
+            PARAM_FAX_NO -> faxNo = it.mValue
+            PARAM_ORG_NAME -> orgName = it.mValue
             //"org" -> orgName = it.mValue
-            "country" -> {
+            PARAM_COUNTRY -> {
                 checkCountry = true
-                countryUrl = "https://flagsapi.com/${it.mValue}/shiny/64.png"
+                countryUrl = String.format(COUNTRY_URL, it.mValue)
             }
 
-            else -> ""
+            else -> EMPTY_STRING
         }
     }
     return OrganizationDomModel(

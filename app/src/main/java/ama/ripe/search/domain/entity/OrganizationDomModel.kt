@@ -5,7 +5,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class OrganizationDomModel(
-    // val id:Int,
     val orgName: String,
     val organization: String,
     val countryFlag: String? = null,

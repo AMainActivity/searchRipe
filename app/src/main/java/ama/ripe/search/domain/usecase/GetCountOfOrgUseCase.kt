@@ -6,6 +6,5 @@ import javax.inject.Inject
 class GetCountOfOrgUseCase @Inject constructor(
     private val repository: RipeSearchRepository
 ) {
-
     operator fun invoke() = repository.getCountOfOrg()
 }

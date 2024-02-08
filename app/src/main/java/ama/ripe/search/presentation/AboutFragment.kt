@@ -1,5 +1,6 @@
 package ama.ripe.search.presentation
 
+import ama.ripe.search.R
 import ama.ripe.search.databinding.FragmentAboutBinding
 import android.annotation.SuppressLint
 import android.content.Context
@@ -40,16 +41,19 @@ class AboutFragment : Fragment() {
         binding.frgmntAbTv.movementMethod = LinkMovementMethod.getInstance()
         binding.frgmntAbTv.text =
             HtmlCompat.fromHtml(
-                "getString(R.string.frgmnt_ab_main)",
+                getString(R.string.frgmnt_about_title),
                 HtmlCompat.FROM_HTML_MODE_LEGACY
             )
+    }
+
+    private fun setSubTitleActionBar(text: String) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.subtitle = text
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (requireActivity() as AppCompatActivity).supportActionBar?.subtitle =
-            "О приложении"
+        setSubTitleActionBar(getString(R.string.frgmnt_about_ab_subtitle))
         setViews()
     }
 

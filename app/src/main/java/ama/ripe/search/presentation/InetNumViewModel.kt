@@ -18,6 +18,4 @@ class InetNumViewModel @Inject constructor(
             getInetNumsByOrgUseCase(string)
         }
     }
-
-
 }

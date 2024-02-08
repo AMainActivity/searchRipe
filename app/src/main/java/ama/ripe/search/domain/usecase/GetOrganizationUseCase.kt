@@ -6,7 +6,6 @@ import javax.inject.Inject
 class GetOrganizationUseCase @Inject constructor(
     private val repository: RipeSearchRepository
 ) {
-
     suspend operator fun invoke(string: String) = repository.getOrganization(string)
     fun orgLiveDate() = repository.getOrganizationLivaData()
 }

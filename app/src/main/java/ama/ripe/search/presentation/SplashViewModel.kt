@@ -24,7 +24,7 @@ class SplashViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val f = d1.await()
+            d1.await()
             _canStart.value = Unit
         }
     }

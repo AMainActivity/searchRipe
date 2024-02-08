@@ -25,7 +25,7 @@ class InetNumFragment : Fragment() {
     private val component by lazy {
         (requireActivity().application as MyApp).component
     }
-    private var orgName: String = ""
+    private var orgName: String = EMPTY_STRING
     private val binding get() = _binding ?: throw RuntimeException("FragmentInetNumBinding == null")
     private lateinit var adapter: InetNumAdapter
 
@@ -39,7 +39,7 @@ class InetNumFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentInetNumBinding.inflate(inflater, container, false)
         return binding.root
@@ -111,10 +111,13 @@ class InetNumFragment : Fragment() {
     private fun setAdapterClick() {
         adapter.onInetNumClickListener = object : InetNumAdapter.OnInetNumClickListener {
             override fun onInetNumClick(tInfo: String) {
-                //launchGameFragment(tInfo)
                 Toast.makeText(requireContext(), tInfo, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun setSubTitleActionBar(text: String) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.subtitle = text
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -123,8 +126,7 @@ class InetNumFragment : Fragment() {
 
         viewModel = ViewModelProvider(this, viewModelFactory)[InetNumViewModel::class.java]
         setAdapter()
-        (requireActivity() as AppCompatActivity).supportActionBar?.subtitle =
-            "Поиск сетей"
+        setSubTitleActionBar(getString(R.string.frgmnt_inetnum_subtitle))
         viewModel.loadData(orgName)
         setObserverState()
         setAdapterClick()
@@ -149,6 +151,7 @@ class InetNumFragment : Fragment() {
     companion object {
 
         const val NAME = "InetNumFragment"
+        const val EMPTY_STRING = ""
         const val ARG_INET_NUM = "ARG_INET_NUM"
 
         fun newInstance(string: String): InetNumFragment {

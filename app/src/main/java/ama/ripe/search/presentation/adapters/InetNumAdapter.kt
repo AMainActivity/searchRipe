@@ -9,8 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.squareup.picasso.Picasso
 
-class InetNumAdapter(
-) : ListAdapter<InetNumDomModel, InetNumViewHolder>(InetNumDiffCallback) {
+class InetNumAdapter : ListAdapter<InetNumDomModel, InetNumViewHolder>(InetNumDiffCallback) {
 
     var onInetNumClickListener: OnInetNumClickListener? = null
     private var unfilteredList = listOf<InetNumDomModel>()
@@ -65,14 +64,8 @@ class InetNumAdapter(
         }
     }
 
-    companion object {
-
-        private const val IMAGE_ENDS = ".png"
-        private const val SECONDS_IN_MINUTE = 60
-    }
-
 
     interface OnInetNumClickListener {
-        fun onInetNumClick(inetNumDomModel: String)
+        fun onInetNumClick(tInfo: String)
     }
 }

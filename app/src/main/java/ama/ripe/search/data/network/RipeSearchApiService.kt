@@ -11,37 +11,41 @@ interface RipeSearchApiService {
 
     @GET("search.json")
     suspend fun getOrganizationByName(
-        @Query("source") source: String = "ripe",
+        @Query("source") source: String = PARAM_RIPE,
         @Query("query-string") queryString: String,
-        @Query("type-filter") typeFilter: String = "organisation",
-        @Query("flags") flags: String = "no-referenced"
+        @Query("type-filter") typeFilter: String = PARAM_ORGANIZATION,
+        @Query("flags") flags: String = PARAM_FLAG
     ): Response<MainDto>
-
 
     @GET("search.json")
     suspend fun getInetNumByOrg(
-        @Query("inverse-attribute") inverseAttribute: String = "org",
-        @Query("source") source: String = "ripe",
+        @Query("inverse-attribute") inverseAttribute: String = PARAM_ORG,
+        @Query("source") source: String = PARAM_RIPE,
         @Query("query-string") queryString: String,
-        @Query("type-filter") typeFilter: String = "inetnum",
+        @Query("type-filter") typeFilter: String = PARAM_INETNUM,
         // @Query("limit") ofset: Int = 10,
-        @Query("flags") flags: String = "no-referenced"
+        @Query("flags") flags: String = PARAM_FLAG
     ): Response<MainDto>
 
-    //   https://rest.db.ripe.net/ripe/organisation/ORG-JR8-RIPE.json
     @GET("ripe/organisation/{org}.json")
     suspend fun getOrganizationByIdentificator(
         @Path("org") orgIdentificator: String
     ): Response<MainDto>
 
-
     @GET("search.json")
     suspend fun getOrganizationByIp(
-        @Query("source") source: String = "ripe",
+        @Query("source") source: String = PARAM_RIPE,
         @Query("query-string") queryString: String,
-        @Query("type-filter") typeFilter: String = "inetnum",
+        @Query("type-filter") typeFilter: String = PARAM_INETNUM,
         // @Query("limit") ofset: Int = 10,
-        @Query("flags") flags: String = "no-referenced"
+        @Query("flags") flags: String = PARAM_FLAG
     ): Response<MainDto>
 
+    companion object {
+        const val PARAM_RIPE = "ripe"
+        const val PARAM_INETNUM = "inetnum"
+        const val PARAM_FLAG = "no-referenced"
+        const val PARAM_ORG = "org"
+        const val PARAM_ORGANIZATION = "organisation"
+    }
 }

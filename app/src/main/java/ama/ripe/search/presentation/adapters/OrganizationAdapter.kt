@@ -3,15 +3,14 @@ package ama.ripe.search.presentation.adapters
 import ama.ripe.search.R
 import ama.ripe.search.databinding.ItemOrganizationBinding
 import ama.ripe.search.domain.entity.OrganizationDomModel
-import android.util.Log
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.squareup.picasso.Picasso
 
-class OrganizationAdapter(
-) : ListAdapter<OrganizationDomModel, OrganizationViewHolder>(OrganizationDiffCallback) {
+class OrganizationAdapter : ListAdapter<OrganizationDomModel, OrganizationViewHolder>(OrganizationDiffCallback) {
 
     var onOrganizationClickListener: OnOrganizationClickListener? = null
     var onButtonInfoClickListener: OnButtonInfoClickListener? = null
@@ -25,10 +24,22 @@ class OrganizationAdapter(
         return OrganizationViewHolder(binding)
     }
 
-    private fun getInfo(itemOrg: OrganizationDomModel): List<String> {
-        val address = if (itemOrg.address.isNotEmpty()) "<b>Адрес: </b> $itemOrg.address" else ""
-        val phone = if (itemOrg.phone.isNotEmpty()) "<b>Телефон: </b> $itemOrg.phone" else ""
-        val faxNo = if (itemOrg.faxNo.isNotEmpty()) "<b>Факс: </b> $itemOrg.faxNo" else ""
+    private fun getInfo(itemOrg: OrganizationDomModel, ctx: Context): List<String> {
+        val address = if (itemOrg.address.isNotEmpty()) String.format(
+            ctx.getString(R.string.org_info_format),
+            ctx.getString(R.string.org_address),
+            itemOrg.address
+        )/*"<b>Адрес: </b> $itemOrg.address"*/ else EMPTY_STRING
+        val phone = if (itemOrg.phone.isNotEmpty()) String.format(
+            ctx.getString(R.string.org_info_format),
+            ctx.getString(R.string.org_phone),
+            itemOrg.phone
+        )/*"<b>Телефон: </b> $itemOrg.phone"*/ else EMPTY_STRING
+        val faxNo = if (itemOrg.faxNo.isNotEmpty()) String.format(
+            ctx.getString(R.string.org_info_format),
+            ctx.getString(R.string.org_faxNo),
+            itemOrg.faxNo
+        )/*"<b>Факс: </b> $itemOrg.faxNo"*/ else EMPTY_STRING
         return listOf(address, phone, faxNo)
     }
 
@@ -41,7 +52,6 @@ class OrganizationAdapter(
 
     override fun onBindViewHolder(holder: OrganizationViewHolder, position: Int) {
         val itemOrg = getItem(position)
-        //Log.e("itemOrg", itemOrg.toString())
         with(holder.binding) {
             with(itemOrg) {
 
@@ -53,12 +63,12 @@ class OrganizationAdapter(
                         .into(ivLogoCountry)
                 ivLogoCountry.visibility = if (countryFlag != null) View.VISIBLE else View.GONE
 
-                val s = getInfo(itemOrg)
+                val s = getInfo(itemOrg, tvInfo.context)
                 setFlagButVisibility(frgmntOrgInfo, s[0] + s[1] + s[2])
 
                 frgmntOrgInfo.setOnClickListener {
                     onButtonInfoClickListener?.onButtonInfoClick(
-                        "$s[0]<br>$s[1]<br>$s[2]"
+                        String.format(ORG_INFO, s[0], s[1], s[2])//"${s[0]}<br>${s[1]}<br>${s[2]}"
                     )
                 }
 
@@ -71,8 +81,8 @@ class OrganizationAdapter(
 
     companion object {
 
-        private const val IMAGE_ENDS = ".png"
-        private const val SECONDS_IN_MINUTE = 60
+        private const val ORG_INFO = "%s<br>%s<br>%s"
+        private const val EMPTY_STRING = ""
     }
 
     interface OnButtonInfoClickListener {
@@ -80,6 +90,6 @@ class OrganizationAdapter(
     }
 
     interface OnOrganizationClickListener {
-        fun onOrganizationClick(orgDomModel: String)
+        fun onOrganizationClick(tInfo: String)
     }
 }

@@ -25,31 +25,30 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-       setBottomNavigation()
+        setBottomNavigation()
     }
 
-private fun setBottomNavigation()
-{
-     val orgFragment = OrganizationFragment()
+    private fun setBottomNavigation() {
+        val orgFragment = OrganizationFragment()
         val aboutFragment = AboutFragment()
         setCurrentFragment(orgFragment, true)
         binding.contentMain.bottomNavigationView.setOnItemSelectedListener {
             setCurrentFragment(
                 when (it.itemId) {
-                    R.id.page_1 -> orgFragment
-                    R.id.page_2 -> aboutFragment
+                    R.id.page_ripe_search -> orgFragment
+                    R.id.page_about -> aboutFragment
                     else -> orgFragment
                 },
                 false
             )
             true
         }
-}
+    }
 
     private fun setCurrentFragment(fragment: Fragment, firstRun: Boolean) =
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_main, fragment)
-            if (! firstRun) addToBackStack(null)
+            if (!firstRun) addToBackStack(null)
             commit()
         }
 
